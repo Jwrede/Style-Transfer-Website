@@ -75,26 +75,25 @@ def style_video(video_path, style, output_name=None, alpha=1.0, preserve_color=F
         resolution = custom_resolution
     fps = reader.get_meta_data()["fps"]
 
-    style = transform.resize(style, resolution)
+    style = transform.resize(style, (resolution[1], resolution[0]))
 
     if not preserve_color:
         style_tensor = torch.tensor(np.expand_dims(
             toTensor(style), 0)).float().to(device)
         style_tensor = net.encode(style_tensor)
 
-    frame_number = 0
     driving_video = []
     for frame_number in tqdm(range(reader.count_frames())):
         try:
             content = reader.get_next_data()
-        except imageio.core.CannotReadFrameError:
-            break
         except IndexError:
             break
         else:
             if custom_resolution is not None:
-                content = transform.resize(content, list(resolution)[::-1])
-            content = content.astype(float)/255
+                content = transform.resize(
+                    content, (resolution[1], resolution[0]))
+            else:
+                content = content.astype(float)/255
             if preserve_color:
                 style_tensor = preserve_color_stable(content, style)
                 style_tensor = torch.tensor(np.expand_dims(
@@ -121,11 +120,12 @@ def style_video(video_path, style, output_name=None, alpha=1.0, preserve_color=F
         writer.send(frame)
     writer.close()
 
-
-'''
-os.system(f"ffmpeg -i {video_PATH} -vn -acodec copy output_audio.aac")
-os.system(
-    f"ffmpeg -i {result_name}_plain.mp4 -i output_audio.aac -c:v copy -c:a aac {result_name}.mp4")
-os.system(f"del output_audio.aac")
-os.system(f"del {result_name}.mp4")
-'''
+    os.system(
+        f'ffmpeg -y -i "{video_path}" -vn -acodec copy "output_audio.aac"')
+    os.system(
+        f'ffmpeg -y -i "{output_name}_plain.mp4" -i "output_audio.aac" -c:v copy -c:a aac "{output_name}.mp4"')
+    os.system(f'del "output_audio.aac"')
+    if not os.path.isfile(f"{output_name}.mp4"):
+        os.rename(f"{output_name}_plain.mp4", f"{output_name}.mp4")
+    else:
+        os.system(f'del "{output_name}_plain.mp4"')

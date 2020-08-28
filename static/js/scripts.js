@@ -244,9 +244,6 @@ function acceptVideo(event, output_div) {
 }
 
 function StyleITVideo() {
-  let content_image = document
-    .getElementById("content-video")
-    .src.split(",")[1];
   let style_image = document.getElementById("style-image3").src.split(",")[1];
   let resolution1 = document.getElementById("drop3").value.split("x")[0];
   let resolution2 = document.getElementById("drop3").value.split("x")[1];
@@ -254,9 +251,14 @@ function StyleITVideo() {
   let preserve_color = $(`input[name='check3']`).is(":checked");
 
   let content_video = document.getElementById("select-content3").files[0];
-  console.log(document.getElementById("select-content3").files[0]);
+
   let formData = new FormData();
   formData.append("content", content_video);
+  formData.append("style", style_image);
+  formData.append("resolution1", resolution1);
+  formData.append("resolution2", resolution2);
+  formData.append("alpha", alpha);
+  formData.append("preserve_color", preserve_color);
 
   req = $.ajax({
     url: "/style_video",
@@ -266,6 +268,6 @@ function StyleITVideo() {
     processData: false,
   });
   req.done(function (data) {
-    console.log("ye");
+    document.getElementById("result-video").src = "static/" + data.path;
   });
 }

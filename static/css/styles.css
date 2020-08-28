@@ -116,7 +116,7 @@ body .checkbox {
   padding-top: 0.5vh;
 }
 
-@media screen and (min-width: 520px) and (max-width: 525px) {
+@media screen and (min-width: 521px) and (max-width: 524px) {
   body .checkbox {
     padding-top: 4.5vh;
   }
@@ -167,6 +167,10 @@ body input:checked[type="checkbox"]:before {
 body .rotate-icon {
   border-radius: 50px 50px 0px 0px;
   border-style: none;
+}
+
+body .dropdown {
+  padding-top: 3px;
 }
 
 body .dropdown #drop {
@@ -232,7 +236,7 @@ body .content-image {
 }
 
 body .label {
-  padding-bottom: 1vh;
+  padding-bottom: 2.2vh;
 }
 
 @media screen and (max-width: 370px) {
@@ -321,6 +325,7 @@ body #page-4 {
 
 body #page-4 #content-video {
   background-color: #000000;
+  display: block;
 }
 
 body #page-5 {

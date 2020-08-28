@@ -461,17 +461,21 @@
                 style="object-fit: fill"
                 controls
               >
-                <source src="../static/img/Minido.mp4" type="video/mp4" />
+                <source
+                  src="../static/img/paulvideo.mp4"
+                  type="video/mp4"
+                  id="video-source"
+                />
               </video>
               <form id="select-content-form3" method="POST">
                 <input
                   type="file"
                   id="select-content3"
-                  accept="video/mp4"
+                  accept="video/*"
                   onchange="acceptVideo(event, 'content-video')"
                 />
-                <label for="select-content3" class="btn">
-                  Select Content Image
+                <label for="select-content3" class="btn" id="help2">
+                  Select Content Video
                 </label>
               </form>
               <button
@@ -540,11 +544,11 @@
                 class="drop"
               >
                 <option>256x256</option>
-                <option>640x360</option>
+                <option selected="standard">640x360</option>
                 <option>360x640</option>
                 <option>512x512</option>
                 <option>720x1280</option>
-                <option selected="standard">1280x720</option>
+                <option>1280x720</option>
                 <option>1080x1920</option>
                 <option>1920x1080</option>
               </select>
@@ -575,9 +579,9 @@
           </div>
           <div class="col-12">
             <div class="download">
-              <button class="btn" onclick="downloadImage('result-video')">
+              <a href="static/result.mp4" class="btn">
                 <i class="fa fa-download" aria-hidden="true"></i>
-              </button>
+              </a>
             </div>
           </div>
         </div>
