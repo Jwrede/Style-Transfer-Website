@@ -22,6 +22,31 @@
     <link rel="icon" type="image/png" href="../static/favicon-16x16.png" />
   </head>
   <body data-spy="scroll" data-target="#navbar" data-offset="70">
+    <div
+      class="modal"
+      id="image-modal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="image-modal-label"
+      aria-hidden="True"
+      data-keyboard="false"
+      data-backdrop="static"
+    >
+      <div class="modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-12" align="center">Loading</div>
+              <progress
+                id="style-transfer-progress"
+                max="100"
+                value="0"
+              ></progress>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <nav
       class="navbar navbar-expand-xl navbar-dark bg-dark fixed-top shadow-lg"
       id="navbar"
@@ -356,9 +381,10 @@
               <div class="row">
                 <div class="col-12">
                   <button
+                    id="random-button-vue"
                     class="btn"
                     name="random-style2"
-                    v-on:click="random()"
+                    v-on:click="random('random-button-vue')"
                   >
                     Random Style Image
                   </button>
@@ -478,13 +504,58 @@
                   Select Content Video
                 </label>
               </form>
-              <button
-                class="btn"
-                id="random-content3"
-                onclick="randomVideo('content-video', 'content-video')"
+              <div
+                id="fps-buttons"
+                class="btn-group btn-group-toggle"
+                data-toggle="buttons"
               >
-                Random Content Image
-              </button>
+                <label
+                  class="btn btn-secondary active fps-button"
+                  id="fps-button1"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="Original FPS, slow"
+                >
+                  <input
+                    type="radio"
+                    name="options"
+                    id="option1"
+                    autocomplete="off"
+                    checked
+                  />
+                  1x
+                </label>
+                <label
+                  class="btn btn-secondary fps-button"
+                  id="fps-button2"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="1/3 of original FPS, faster"
+                >
+                  <input
+                    type="radio"
+                    name="options"
+                    id="option2"
+                    autocomplete="off"
+                  />
+                  1/3x
+                </label>
+                <label
+                  class="btn btn-secondary fps-button"
+                  id="fps-button3"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="1/10 of original FPS, fastest"
+                >
+                  <input
+                    type="radio"
+                    name="options"
+                    id="option3"
+                    autocomplete="off"
+                  />
+                  1/10x
+                </label>
+              </div>
             </div>
             <div class="col-6" align="center">
               <img
@@ -554,7 +625,11 @@
               </select>
             </div>
             <div class="col-6 styleit">
-              <button class="btn" id="submit-button3" onclick="StyleITVideo()">
+              <button
+                class="btn"
+                id="submit-button3"
+                onclick="StyleITVideo(this.id)"
+              >
                 <span id="style">Style</span>
                 <span id="it">IT</span>
               </button>
@@ -579,7 +654,7 @@
           </div>
           <div class="col-12">
             <div class="download">
-              <a href="static/result.mp4" class="btn">
+              <a href="../static/result.mp4" class="btn" download>
                 <i class="fa fa-download" aria-hidden="true"></i>
               </a>
             </div>

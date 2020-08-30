@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, jsonify, send_from_directory, send_static_file
+from flask import Flask, render_template, url_for, request, redirect, jsonify
 import matplotlib.pyplot as plt
 from base64 import b64encode, b64decode
 from io import BytesIO
@@ -7,16 +7,22 @@ from test import style_image, style_interpolation, style_video
 import numpy as np
 from skimage.transform import resize
 import cv2
-from os import listdir, system
+from os import listdir, system, remove
 from random import randint
 from imageio import get_reader
 from shutil import copy, move
+import glob
 
 app = Flask(__name__)
 
 
 @app.route('/')
 def index():
+    if glob.glob("content_video.*"):
+        for f in glob.glob("content_video.*"):
+            remove(f)
+    if glob.glob("paulvideo.mp4"):
+        remove("paulvideo.mp4")
     return render_template('index.html')
 
 
@@ -80,20 +86,15 @@ def StyleIT_video():
     style = resize(np.asarray(Image.open(
         BytesIO(b64decode(style_base64))).convert("RGB")), resolution)
     alpha = float(request.form['alpha'])
+    fps = int(request.form['fps'])
     preserve_color = False if request.form['preserve_color'] == 'false' else True
 
     style_video(filepath, style,
-                "result", alpha, preserve_color, resolution)
+                "result", alpha, preserve_color, resolution, frame_skip=fps)
     system(f'del {filepath}')
     move('result.mp4', 'static/result.mp4')
 
     return jsonify({'path': "result.mp4"})
-
-
-@app.route('/static/<path:path>')
-def download_video(path):
-    print("ye")
-    return send_static_file(path, as_attachment=True)
 
 
 @app.route('/random', methods=["POST"])
@@ -109,4 +110,4 @@ def random():
 
 
 if __name__ == "__main__":
-    app.run(debug="True", host="0.0.0.0")
+    app.run(debug=True, host="0.0.0.0")

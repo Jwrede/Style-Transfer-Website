@@ -10,6 +10,19 @@ body {
   background-repeat: no-repeat;
 }
 
+body .modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+body progress {
+  width: 100%;
+  margin: 2vw;
+}
+
 body #it {
   color: #4EFDC6;
 }
@@ -84,6 +97,10 @@ body input[type="file"] {
   -moz-appearance: none;
        appearance: none;
   display: none;
+}
+
+body #fps-buttons {
+  width: 100%;
 }
 
 body .slider .rangeValue {
@@ -183,6 +200,10 @@ body .download {
 }
 
 body .download button {
+  width: 20%;
+}
+
+body .download a {
   width: 20%;
 }
 

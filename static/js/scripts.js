@@ -20,6 +20,10 @@ document.onscroll = function () {
   ).text();
 };
 
+$(document).ready(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
 function rangeSlide(value, page) {
   document.getElementById("rangeValue" + page).innerHTML = parseFloat(value)
     .toFixed(2)
@@ -37,15 +41,37 @@ function acceptImage(event, output_div) {
   reader.readAsDataURL(input.files[0]);
 }
 
+function progresstime(resolution, multiplier = 1) {
+  if (resolution === "256x256") {
+    return 55 * multiplier;
+  } else if (resolution === "640x360" || resolution === "360x640") {
+    return 75 * multiplier;
+  } else if (resolution === "512x512") {
+    return 80 * multiplier;
+  } else if (resolution === "1280x720" || resolution === "720x1280") {
+    return 160 * multiplier;
+  } else if (resolution === "1920x1080" || resolution === "1080x1920") {
+    return 350 * multiplier;
+  }
+}
+
 function StyleIT(page) {
+  $("#image-modal").modal("show");
   let content_image = document
     .getElementById("content-image" + page)
     .src.split(",")[1];
   let style_image = document
     .getElementById("style-image" + page)
     .src.split(",")[1];
-  let resolution1 = document.getElementById("drop" + page).value.split("x")[0];
-  let resolution2 = document.getElementById("drop" + page).value.split("x")[1];
+
+  let resolution = document.getElementById("drop" + page).value;
+
+  var timer = setInterval(function () {
+    document.getElementById("style-transfer-progress").value += 10;
+  }, progresstime(resolution, 10));
+
+  let resolution1 = resolution.split("x")[0];
+  let resolution2 = resolution.split("x")[1];
   let alpha = document.getElementById("input-slider" + page).value;
   let preserve_color = $(`input[name='check${page}']`).is(":checked");
 
@@ -64,7 +90,9 @@ function StyleIT(page) {
   req.done(function (data) {
     document.getElementById("result-image" + page).src =
       "data:image/png;base64," + data.result;
-    console.log("data:image/png;base64," + data.result);
+    $("#image-modal").modal("hide");
+    clearInterval(timer);
+    document.getElementById("style-transfer-progress").value = 0;
   });
 }
 
@@ -113,6 +141,7 @@ new Vue({
   delimiters: ["[[", "]]"],
   el: "#style-images-wrapper",
   data: {
+    amount: 2,
     images: [
       {
         image:
@@ -126,7 +155,8 @@ new Vue({
   },
   methods: {
     add: function (event) {
-      if (this.images.length <= 8) {
+      if (this.amount <= 4) {
+        this.amount += 1;
         var that = this.images;
         var input = event.target;
         var reader = new FileReader();
@@ -136,11 +166,12 @@ new Vue({
         };
         reader.readAsDataURL(input.files[0]);
       } else {
-        alert("Maximum of 8 style images");
+        alert("Maximum of 5 style images");
       }
     },
-    random: function () {
-      if (this.images.length <= 8) {
+    random: function (clicked_id) {
+      if (this.amount <= 4) {
+        this.amount += 1;
         var that = this.images;
         req = $.ajax({
           url: "/random",
@@ -150,12 +181,12 @@ new Vue({
           },
         });
         req.done(function (data) {
-          var output = that.push({
+          that.push({
             image: "data:image/png;base64," + data.img,
           });
         });
       } else {
-        alert("Maximum of 8 style images");
+        alert("Maximum of 5 style images");
       }
     },
     remove: function () {
@@ -173,25 +204,45 @@ new Vue({
           );
         }
         this.images.splice(index, 1);
+        this.amount -= 1;
       } else {
         alert("No Images to remove!");
       }
     },
     StyleIT: function () {
-      if (this.images.length === 0) {
+      if (this.amount === 0) {
         alert("No style images selected!");
       } else {
+        $("#image-modal").modal("show");
         let content_image = document
           .getElementById("content-image2")
           .src.split(",")[1];
-        let resolution1 = document.getElementById("drop2").value.split("x")[0];
-        let resolution2 = document.getElementById("drop2").value.split("x")[1];
+
+        let resolution = document.getElementById("drop2").value;
+
+        let multiplier;
+        if (
+          ["720x1280", "1280x720", "1080x1920", "1920x1080"].includes(
+            resolution
+          )
+        ) {
+          multiplier = 10 * (0.6 + this.amount * 0.4);
+        } else {
+          multiplier = 10;
+        }
+        console.log(multiplier);
+
+        var timer = setInterval(function () {
+          document.getElementById("style-transfer-progress").value += 10;
+        }, progresstime(resolution, multiplier));
+
+        let resolution1 = resolution.split("x")[0];
+        let resolution2 = resolution.split("x")[1];
         let alpha = document.getElementById("input-slider2").value;
         let preserve_color = $(`input[name='check2']`).is(":checked");
 
         let styles = [];
         for (var i of this.images) {
-          console.log(i.image);
           styles.push(i.image.split(",")[1]);
         }
 
@@ -210,7 +261,9 @@ new Vue({
         req.done(function (data) {
           document.getElementById("result-image2").src =
             "data:image/png;base64," + data.result;
-          console.log("data:image/png;base64," + data.result);
+          $("#image-modal").modal("hide");
+          clearInterval(timer);
+          document.getElementById("style-transfer-progress").value = 0;
         });
       }
     },
@@ -243,12 +296,22 @@ function acceptVideo(event, output_div) {
   reader.readAsDataURL(input.files[0]);
 }
 
-function StyleITVideo() {
+function StyleITVideo(clicked_id) {
+  document.getElementById(clicked_id).onclick = null;
+
   let style_image = document.getElementById("style-image3").src.split(",")[1];
   let resolution1 = document.getElementById("drop3").value.split("x")[0];
   let resolution2 = document.getElementById("drop3").value.split("x")[1];
   let alpha = document.getElementById("input-slider3").value;
   let preserve_color = $(`input[name='check3']`).is(":checked");
+  let fps = document.getElementsByClassName("active fps-button")[0].id;
+  if (fps === "fps-button1") {
+    fps = 1;
+  } else if (fps === "fps-button2") {
+    fps = 3;
+  } else if (fps === "fps-button3") {
+    fps = 10;
+  }
 
   let content_video = document.getElementById("select-content3").files[0];
 
@@ -259,6 +322,7 @@ function StyleITVideo() {
   formData.append("resolution2", resolution2);
   formData.append("alpha", alpha);
   formData.append("preserve_color", preserve_color);
+  formData.append("fps", fps);
 
   req = $.ajax({
     url: "/style_video",
@@ -269,5 +333,8 @@ function StyleITVideo() {
   });
   req.done(function (data) {
     document.getElementById("result-video").src = "static/" + data.path;
+    document.getElementById(clicked_id).onclick = function () {
+      StyleITVideo(this.id);
+    };
   });
 }

@@ -63,7 +63,7 @@ def style_interpolation(content, styles, weights, alpha=1.0, plot=True, preserve
     return result
 
 
-def style_video(video_path, style, output_name=None, alpha=1.0, preserve_color=False, custom_resolution=None):
+def style_video(video_path, style, output_name=None, alpha=1.0, preserve_color=False, custom_resolution=None, frame_skip=1):
     toTensor = ToTensor()
 
     reader = imageio.get_reader(video_path)
@@ -73,7 +73,7 @@ def style_video(video_path, style, output_name=None, alpha=1.0, preserve_color=F
         resolution = reader.get_meta_data()["source_size"]
     else:
         resolution = custom_resolution
-    fps = reader.get_meta_data()["fps"]
+    fps = reader.get_meta_data()["fps"]/frame_skip
 
     style = transform.resize(style, (resolution[1], resolution[0]))
 
@@ -89,24 +89,26 @@ def style_video(video_path, style, output_name=None, alpha=1.0, preserve_color=F
         except IndexError:
             break
         else:
-            if custom_resolution is not None:
-                content = transform.resize(
-                    content, (resolution[1], resolution[0]))
-            else:
-                content = content.astype(float)/255
-            if preserve_color:
-                style_tensor = preserve_color_stable(content, style)
-                style_tensor = torch.tensor(np.expand_dims(
-                    toTensor(style_tensor), 0)).float().to(device)
-                style_tensor = net.encode(style_tensor)
+            if frame_number % frame_skip == 0:
+                if custom_resolution is not None:
+                    content = transform.resize(
+                        content, (resolution[1], resolution[0]))
+                else:
+                    content = content.astype(float)/255
+                if preserve_color:
+                    style_tensor = preserve_color_stable(content, style)
+                    style_tensor = torch.tensor(np.expand_dims(
+                        toTensor(style_tensor), 0)).float().to(device)
+                    style_tensor = net.encode(style_tensor)
 
-            x = torch.tensor(toTensor(content)).unsqueeze(0).float().to(device)
-            x = net.encode(x)
-            result = adaIN(x, style_tensor)
-            result = (1-alpha) * x + alpha * result
-            result = test(content, result, alpha, False, False)
-            result = cv2.convertScaleAbs(result*255)
-            driving_video.append(result)
+                x = torch.tensor(toTensor(content)).unsqueeze(
+                    0).float().to(device)
+                x = net.encode(x)
+                result = adaIN(x, style_tensor)
+                result = (1-alpha) * x + alpha * result
+                result = test(content, result, alpha, False, False)
+                result = cv2.convertScaleAbs(result*255)
+                driving_video.append(result)
     reader.close()
 
     if output_name == None:

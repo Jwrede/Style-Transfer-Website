@@ -12,6 +12,14 @@ body
   font-size: 30px
   background-image: url("../img/Background.jpg")
   background-repeat: no-repeat;
+  .modal
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+  progress
+    width: 100%
+    margin: 2vw
   #it
     color: $style_color
   nav
@@ -52,6 +60,8 @@ body
     -webkit-appearance: none
     appearance: none
     display: none
+  #fps-buttons
+    width: 100%
   .slider
     .rangeValue
       color: $style_color
@@ -113,6 +123,9 @@ body
   .download
     padding-top: 1vh
     button
+      width: 20%
+  .download
+    a
       width: 20%
   .result-image
     border-radius: 50px
