@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="./static/css/styles.css" />
     <link
       rel="stylesheet"
-      href="http://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
     />
     <link
       rel="stylesheet"
@@ -39,6 +39,102 @@
               <div class="col-12" align="center">Loading</div>
               <progress
                 id="style-transfer-progress"
+                max="100"
+                value="0"
+              ></progress>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal"
+      id="video-modal-upload"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="video-modal-upload-label"
+      aria-hidden="True"
+      data-keyboard="false"
+      data-backdrop="static"
+    >
+      <div class="modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-12" align="center">Uploading</div>
+              <progress></progress>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal"
+      id="video-modal-wait"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="video-modal-wait-label"
+      aria-hidden="True"
+      data-keyboard="false"
+      data-backdrop="static"
+    >
+      <div class="modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="container" align="center">
+              <div class="row">
+                <div class="col-12" id="time-estimation">
+                  Estimated time: 0 sec
+                </div>
+                <div class="col-12" id="modal-footer">
+                  <small> Too slow? send an Email with your video to: </small>
+                  <a
+                    class="nav-link waves-effect waves-light"
+                    href="mailto: wrede.jonathan00@gmail.com"
+                    target="_blank"
+                    id="mail-link"
+                  >
+                    <i style="cursor: pointer" class="fa fa-envelope"></i>
+                  </a>
+                </div>
+                <button
+                  type="button"
+                  class="btn col-6"
+                  onclick="StyleITVideo_exec()"
+                >
+                  Continue
+                </button>
+                <button
+                  type="button"
+                  class="btn col-6"
+                  onclick="StyleITVideo_cancel()"
+                  data-dismiss="modal"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal"
+      id="video-modal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="video-modal-label"
+      aria-hidden="True"
+      data-keyboard="false"
+      data-backdrop="static"
+    >
+      <div class="modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-12" align="center">Loading</div>
+              <progress
+                id="video-style-transfer-progress"
                 max="100"
                 value="0"
               ></progress>
@@ -497,10 +593,17 @@
                 <input
                   type="file"
                   id="select-content3"
-                  accept="video/*"
+                  accept="video/mp4"
                   onchange="acceptVideo(event, 'content-video')"
                 />
-                <label for="select-content3" class="btn" id="help2">
+                <label
+                  for="select-content3"
+                  class="btn"
+                  id="help2"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="Can't find your video? Convert it to .mp4 with: https://cloudconvert.com/"
+                >
                   Select Content Video
                 </label>
               </form>
@@ -510,7 +613,7 @@
                 data-toggle="buttons"
               >
                 <label
-                  class="btn btn-secondary active fps-button"
+                  class="btn btn-secondary fps-button"
                   id="fps-button1"
                   data-toggle="tooltip"
                   data-placement="top"
@@ -526,7 +629,7 @@
                   1x
                 </label>
                 <label
-                  class="btn btn-secondary fps-button"
+                  class="btn btn-secondary active fps-button"
                   id="fps-button2"
                   data-toggle="tooltip"
                   data-placement="top"
@@ -618,18 +721,10 @@
                 <option selected="standard">640x360</option>
                 <option>360x640</option>
                 <option>512x512</option>
-                <option>720x1280</option>
-                <option>1280x720</option>
-                <option>1080x1920</option>
-                <option>1920x1080</option>
               </select>
             </div>
             <div class="col-6 styleit">
-              <button
-                class="btn"
-                id="submit-button3"
-                onclick="StyleITVideo(this.id)"
-              >
+              <button class="btn" id="submit-button3" onclick="StyleITVideo()">
                 <span id="style">Style</span>
                 <span id="it">IT</span>
               </button>
@@ -649,7 +744,7 @@
               style="object-fit: fill"
               controls
             >
-              <source src="../static/img/paulvideo.mp4" type="video/mp4" />
+              <source src="../static/img/result.mp4" type="video/mp4" />
             </video>
           </div>
           <div class="col-12">
@@ -707,7 +802,7 @@
       </div>
     </div>
   </body>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
   <script
     src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
     integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"

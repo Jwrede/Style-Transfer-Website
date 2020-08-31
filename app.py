@@ -7,11 +7,12 @@ from test import style_image, style_interpolation, style_video
 import numpy as np
 from skimage.transform import resize
 import cv2
-from os import listdir, system, remove
+from os import listdir, system, remove, environ
 from random import randint
 from imageio import get_reader
 from shutil import copy, move
 import glob
+from pymediainfo import MediaInfo
 
 app = Flask(__name__)
 
@@ -21,8 +22,6 @@ def index():
     if glob.glob("content_video.*"):
         for f in glob.glob("content_video.*"):
             remove(f)
-    if glob.glob("paulvideo.mp4"):
-        remove("paulvideo.mp4")
     return render_template('index.html')
 
 
@@ -71,15 +70,27 @@ def StyleIT_interpolation():
     return jsonify({'result': result})
 
 
-@app.route('/style_video', methods=["POST"])
-def StyleIT_video():
+@app.route('/upload_video', methods=["POST"])
+def upload_video():
     try:
-        video = request.files['content']
+        video = request.files['video']
         filepath = "content_video." + video.filename.split(".")[1]
         video.save(filepath)
+        media_info = MediaInfo.parse(filepath)
+        duration = media_info.tracks[0].duration/1000
+        fps = media_info.tracks[0].frame_rate
+        print(fps)
+        return jsonify({'duration': duration, 'frame_rate': fps})
     except KeyError:
         filepath = "paulvideo.mp4"
         copy(f"static/img/{filepath}", f"{filepath}")
+        move(f"{filepath}", "content_video.mp4")
+        return jsonify({'duration': 11.562667, 'frame_rate': 29.856})
+
+
+@app.route('/style_video', methods=["POST"])
+def StyleIT_video():
+    filepath = "content_video.mp4"
     resolution = (int(request.form['resolution2']),
                   int(request.form['resolution1']))
     style_base64 = request.form['style']
@@ -91,7 +102,7 @@ def StyleIT_video():
 
     style_video(filepath, style,
                 "result", alpha, preserve_color, resolution, frame_skip=fps)
-    system(f'del {filepath}')
+    remove(filepath)
     move('result.mp4', 'static/result.mp4')
 
     return jsonify({'path': "result.mp4"})
@@ -110,4 +121,4 @@ def random():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, host="0.0.0.0", port=int(environ.get('PORT', 8080)))

@@ -21,6 +21,20 @@ body .modal {
 body progress {
   width: 100%;
   margin: 2vw;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+}
+
+body small {
+  font-size: 13px;
+}
+
+body #time-estimation {
+  padding-bottom: 0.5vw;
+}
+
+body #mail-link {
+  padding-bottom: 0.5vw;
 }
 
 body #it {

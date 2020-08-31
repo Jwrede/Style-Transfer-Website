@@ -10,3 +10,4 @@ tqdm==4.48.2
 imageio-ffmpeg==0.4.2
 torch===1.6.0 
 torchvision===0.7.0 -f https://download.pytorch.org/whl/torch_stable.html
+pymediainfo==4.2.1

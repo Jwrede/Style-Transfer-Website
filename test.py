@@ -126,8 +126,9 @@ def style_video(video_path, style, output_name=None, alpha=1.0, preserve_color=F
         f'ffmpeg -y -i "{video_path}" -vn -acodec copy "output_audio.aac"')
     os.system(
         f'ffmpeg -y -i "{output_name}_plain.mp4" -i "output_audio.aac" -c:v copy -c:a aac "{output_name}.mp4"')
-    os.system(f'del "output_audio.aac"')
+    if os.path.isfile("output_audio.aac"):
+        os.remove("output_audio.aac")
     if not os.path.isfile(f"{output_name}.mp4"):
         os.rename(f"{output_name}_plain.mp4", f"{output_name}.mp4")
     else:
-        os.system(f'del "{output_name}_plain.mp4"')
+        os.remove(f'{output_name}_plain.mp4')

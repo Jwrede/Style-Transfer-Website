@@ -90,9 +90,18 @@ function StyleIT(page) {
   req.done(function (data) {
     document.getElementById("result-image" + page).src =
       "data:image/png;base64," + data.result;
-    $("#image-modal").modal("hide");
-    clearInterval(timer);
-    document.getElementById("style-transfer-progress").value = 0;
+    if (document.getElementById("style-transfer-progress").value < 100) {
+      document.getElementById("style-transfer-progress").value = 100;
+      setTimeout(function () {
+        $("#image-modal").modal("hide");
+        clearInterval(timer);
+        document.getElementById("style-transfer-progress").value = 0;
+      }, 500);
+    } else {
+      $("#image-modal").modal("hide");
+      clearInterval(timer);
+      document.getElementById("style-transfer-progress").value = 0;
+    }
   });
 }
 
@@ -230,7 +239,6 @@ new Vue({
         } else {
           multiplier = 10;
         }
-        console.log(multiplier);
 
         var timer = setInterval(function () {
           document.getElementById("style-transfer-progress").value += 10;
@@ -261,9 +269,18 @@ new Vue({
         req.done(function (data) {
           document.getElementById("result-image2").src =
             "data:image/png;base64," + data.result;
-          $("#image-modal").modal("hide");
-          clearInterval(timer);
-          document.getElementById("style-transfer-progress").value = 0;
+          if (document.getElementById("style-transfer-progress").value < 100) {
+            document.getElementById("style-transfer-progress").value = 100;
+            setTimeout(function () {
+              $("#image-modal").modal("hide");
+              clearInterval(timer);
+              document.getElementById("style-transfer-progress").value = 0;
+            }, 500);
+          } else {
+            $("#image-modal").modal("hide");
+            clearInterval(timer);
+            document.getElementById("style-transfer-progress").value = 0;
+          }
         });
       }
     },
@@ -296,14 +313,33 @@ function acceptVideo(event, output_div) {
   reader.readAsDataURL(input.files[0]);
 }
 
-function StyleITVideo(clicked_id) {
-  document.getElementById(clicked_id).onclick = null;
+function progresstime_video(resolution, fps) {
+  if (resolution === "256x256") {
+    return 1.2 * fps;
+  } else if (resolution === "640x360" || resolution === "360x640") {
+    return (1 / 3) * fps;
+  } else if (resolution === "512x512") {
+    return (1 / 3.1) * fps;
+  } else if (resolution === "1280x720" || resolution === "720x1280") {
+    return 1.2 * fps;
+  } else if (resolution === "1920x1080" || resolution === "1080x1920") {
+    return 1.2 * fps;
+  }
+}
 
-  let style_image = document.getElementById("style-image3").src.split(",")[1];
-  let resolution1 = document.getElementById("drop3").value.split("x")[0];
-  let resolution2 = document.getElementById("drop3").value.split("x")[1];
-  let alpha = document.getElementById("input-slider3").value;
-  let preserve_color = $(`input[name='check3']`).is(":checked");
+var video_length = 0;
+
+function StyleITVideo() {
+  document.getElementById("submit-button3").onclick = null;
+  $("#video-modal-upload").modal("show");
+
+  let content_video = document.getElementById("select-content3").files[0];
+
+  let formData1 = new FormData();
+  formData1.append("video", content_video);
+
+  let resolution = document.getElementById("drop3").value;
+
   let fps = document.getElementsByClassName("active fps-button")[0].id;
   if (fps === "fps-button1") {
     fps = 1;
@@ -313,10 +349,56 @@ function StyleITVideo(clicked_id) {
     fps = 10;
   }
 
-  let content_video = document.getElementById("select-content3").files[0];
+  req = $.ajax({
+    url: "/upload_video",
+    type: "POST",
+    data: formData1,
+    contentType: false,
+    processData: false,
+  });
+  req.done(function (data) {
+    $("#video-modal-upload").modal("hide");
+    document.getElementById("video-style-transfer-progress").max =
+      data.duration * data.frame_rate;
+    var estimated_time =
+      (data.duration * data.frame_rate) / progresstime_video(resolution, fps);
+
+    estimated_time =
+      Math.floor(estimated_time / 60) + "." + Math.floor(estimated_time % 60);
+
+    document.getElementById(
+      "time-estimation"
+    ).textContent = `Estimated Time: ${estimated_time} min`;
+    $("#video-modal-wait").modal("show");
+  });
+}
+
+function StyleITVideo_exec() {
+  $("#video-modal-wait").modal("hide");
+  $("#video-modal").modal("show");
+
+  let style_image = document.getElementById("style-image3").src.split(",")[1];
+
+  let resolution = document.getElementById("drop3").value;
+  let resolution1 = resolution.split("x")[0];
+  let resolution2 = resolution.split("x")[1];
+  let alpha = document.getElementById("input-slider3").value;
+  let preserve_color = $(`input[name='check3']`).is(":checked");
+
+  let fps = document.getElementsByClassName("active fps-button")[0].id;
+  if (fps === "fps-button1") {
+    fps = 1;
+  } else if (fps === "fps-button2") {
+    fps = 3;
+  } else if (fps === "fps-button3") {
+    fps = 10;
+  }
+
+  var timer = setInterval(function () {
+    document.getElementById("video-style-transfer-progress").value += 1;
+  }, 1000 / progresstime_video(resolution, fps));
 
   let formData = new FormData();
-  formData.append("content", content_video);
   formData.append("style", style_image);
   formData.append("resolution1", resolution1);
   formData.append("resolution2", resolution2);
@@ -333,8 +415,31 @@ function StyleITVideo(clicked_id) {
   });
   req.done(function (data) {
     document.getElementById("result-video").src = "static/" + data.path;
-    document.getElementById(clicked_id).onclick = function () {
+    document.getElementById("submit-button3").onclick = function () {
       StyleITVideo(this.id);
     };
+    if (
+      document.getElementById("video-style-transfer-progress").value <
+      document.getElementById("video-style-transfer-progress").max
+    ) {
+      document.getElementById(
+        "video-style-transfer-progress"
+      ).value = document.getElementById("video-style-transfer-progress").max;
+      setTimeout(function () {
+        $("#video-modal").modal("hide");
+        clearInterval(timer);
+        document.getElementById("video-style-transfer-progress").value = 0;
+      }, 500);
+    } else {
+      $("#video-modal").modal("hide");
+      clearInterval(timer);
+      document.getElementById("video-style-transfer-progress").value = 0;
+    }
   });
+}
+
+function StyleITVideo_cancel() {
+  document.getElementById("submit-button3").onclick = function () {
+    StyleITVideo(this.id);
+  };
 }
