@@ -120,5 +120,17 @@ def random():
     return jsonify({'img': img})
 
 
+@app.route('/rotate', methods=["POST"])
+def rotate():
+    f = request.form['file']
+    result = Image.open(BytesIO(b64decode(f.split(",")[1]))).rotate(
+        90, resample=0, expand=True)
+    buffered = BytesIO()
+    result.save(buffered, format="JPEG")
+    result = f.split(",")[0] + "," + \
+        b64encode(buffered.getvalue()).decode('ascii')
+    return jsonify({'result': result})
+
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(environ.get('PORT', 8080)))

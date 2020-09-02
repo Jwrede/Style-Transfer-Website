@@ -1,4 +1,4 @@
-$style_color: #4EFDC6
+$style_color: rgb(78, 253, 198)
 $text_color: #ffffff
 $shadow_color: #000000
 $title_size: 100px
@@ -11,7 +11,11 @@ body
   font-weight: bold
   font-size: 30px
   background-image: url("../img/Background.jpg")
-  background-repeat: no-repeat;
+  background-size: 100% 40%
+  background-repeat: no-repeat
+  @media screen and ( max-width: 1200px )
+    background-attachment: fixed;
+    background-size: 500%;
   .modal
     position: fixed;
     top: 50%;
@@ -44,6 +48,10 @@ body
         font-size: 15px
       @media screen and ( max-width: 370px )
         font-size: 12px
+  .bottom-text
+    @media screen and ( max-height:  550px)
+      display: none
+      
   .btn
     color: $shadow_color
     text-shadow: none
@@ -185,7 +193,7 @@ body
     background: #c2c9d2
   
   #page-1
-    height: 95vh
+    height: 100vh
     padding-top: 70px
     #title-container
       @media screen and (min-width: 992px)
@@ -211,18 +219,3 @@ body
     #content-video
       background-color: $shadow_color
       display: block
-  #page-5
-    padding-top: 10vh
-    #explanaition
-      margin: 5vh
-      height: 80vh
-      background-color: rgba(78, 253, 198, 0.6)
-      border-radius: 4px
-      overflow-y: scroll
-      #text
-        margin: 2vh
-  #page-6
-    padding-top: 20vh
-    height: 95vh
-    #form-message
-      height: 30vh

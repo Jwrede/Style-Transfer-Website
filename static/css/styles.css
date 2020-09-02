@@ -7,7 +7,15 @@ body {
   font-weight: bold;
   font-size: 30px;
   background-image: url("../img/Background.jpg");
+  background-size: 100% 40%;
   background-repeat: no-repeat;
+}
+
+@media screen and (max-width: 1200px) {
+  body {
+    background-attachment: fixed;
+    background-size: 500%;
+  }
 }
 
 body .modal {
@@ -38,7 +46,7 @@ body #mail-link {
 }
 
 body #it {
-  color: #4EFDC6;
+  color: #4efdc6;
 }
 
 body nav li {
@@ -51,7 +59,7 @@ body nav #style, body nav #it {
 }
 
 body nav #curr_page {
-  color: #4EFDC6;
+  color: #4efdc6;
   font-size: 30px;
 }
 
@@ -70,6 +78,12 @@ body nav #curr_page {
 @media screen and (max-width: 370px) {
   body nav #curr_page {
     font-size: 12px;
+  }
+}
+
+@media screen and (max-height: 550px) {
+  body .bottom-text {
+    display: none;
   }
 }
 
@@ -118,7 +132,7 @@ body #fps-buttons {
 }
 
 body .slider .rangeValue {
-  color: #4EFDC6;
+  color: #4efdc6;
 }
 
 body .slider .range {
@@ -139,8 +153,8 @@ body .slider .range::-webkit-slider-thumb {
   height: 15px;
   border-radius: 50%;
   background: #ffffff;
-  -webkit-box-shadow: -407px 0 0 400px #4EFDC6;
-          box-shadow: -407px 0 0 400px #4EFDC6;
+  -webkit-box-shadow: -407px 0 0 400px #4efdc6;
+          box-shadow: -407px 0 0 400px #4efdc6;
 }
 
 body .checkbox {
@@ -171,7 +185,7 @@ body input[type="checkbox"] {
 }
 
 body input:checked[type="checkbox"] {
-  background: #4EFDC6;
+  background: #4efdc6;
 }
 
 body input[type="checkbox"]:before {
@@ -322,7 +336,7 @@ body ::-webkit-scrollbar-thumb {
 }
 
 body #page-1 {
-  height: 95vh;
+  height: 100vh;
   padding-top: 70px;
 }
 
@@ -361,30 +375,5 @@ body #page-4 {
 body #page-4 #content-video {
   background-color: #000000;
   display: block;
-}
-
-body #page-5 {
-  padding-top: 10vh;
-}
-
-body #page-5 #explanaition {
-  margin: 5vh;
-  height: 80vh;
-  background-color: rgba(78, 253, 198, 0.6);
-  border-radius: 4px;
-  overflow-y: scroll;
-}
-
-body #page-5 #explanaition #text {
-  margin: 2vh;
-}
-
-body #page-6 {
-  padding-top: 20vh;
-  height: 95vh;
-}
-
-body #page-6 #form-message {
-  height: 30vh;
 }
 /*# sourceMappingURL=styles.css.map */
